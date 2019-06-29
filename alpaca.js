@@ -3,7 +3,7 @@ const Alpaca = require("@alpacahq/alpaca-trade-api");
 const { bars_to_csv, csv_to_json, decend_timestamps } = require("./utils/transform.js");
 require("./utils/logger.js");
 const fs = require("fs-extra");
-
+const high_vol_symbols = require('./utils/symbols.js')
 const {
   save_data,
   write_access_token,
@@ -30,30 +30,39 @@ async function get_sccount() {
   console.log("Current Account:", account);
 }
 
-get_data("MSFT");
+// gather_all_symbols()//Get all symbols in the symbols.js file
+function gather_all_symbols(){
+  high_vol_symbols.map((symbol, index)=>{
+    setTimeout(()=>{
+      get_data(symbol)
+    }, index*1000*90)
+  })
+}
+
+// get_data("OXY");
 async function get_data(symbol) {
   logger.log(`getting data for ${symbol}`)
   let iterations = 0
   let data_path = `${DATA_DIR}/${symbol}`;
-  let filename = `minutely_${symbol}.csv`;
+  let filename = `15MIN_${symbol}.csv`;
   let file_path = `${data_path}/${filename}`;
   await make_path_exist(data_path);
 
   /* ensure files exists */
-  let {csv_file_data, fd} = await open_file(file_path);
+  let {csv_file_data, appendable_fd} = await open_file(file_path);
   // console.log(data);//file data....
   if (!csv_file_data.length) {
 
     logger.log("File is empty!");
-    let start = new Date("2019", "5", "24", "0", "0");
-    let end = new Date("2019", "5", "25", "0", "0");
+    let start = 0
+    let end = new Date("2019", "5", "27", "0", "0");
     let bars = await get_minutely(symbol,start, end)
     let csv_data = await bars_to_csv(bars[symbol], true);
 
     /* write the data */
-    save_fd(fd, csv_data);
+    save_fd(appendable_fd, csv_data);
     iterations++
-    setTimeout(()=> get_data(symbol) , 1000)
+    setTimeout(()=> get_data(symbol) , 2500)
   } else {
     logger.log("read the data and add to it".yellow);
     let json_data = await csv_to_json(csv_file_data);
@@ -61,22 +70,29 @@ async function get_data(symbol) {
     let time_ordered_json = await decend_timestamps(json_data)
 
     let data_len = time_ordered_json.length
-    let newest = (time_ordered_json[data_len-2].t*1000)
+    let newest = (time_ordered_json[data_len-1].t*1000)
     let oldest = time_ordered_json[0].t*1000
     console.log({oldest:new Date(oldest), newest:new Date(newest)})
     let month = 1000*60*60*24*30
-    let bars = await get_minutely(symbol,new Date(oldest-month), new Date(oldest))
-    logger.log(bars[symbol].length)
-    let csv_data = await bars_to_csv(bars[symbol]);
 
+    let bars = await get_minutely(symbol,new Date(oldest-(month)), new Date(oldest))
+    // logger.log(bars)
+
+    /* decend bars */
+    let time_ordered_bars = await decend_timestamps(bars[symbol])
+
+    logger.log(time_ordered_bars.length)
+    let csv_data = await bars_to_csv(time_ordered_bars);
+    
     /* write the data */
-    save_fd(fd, csv_data);
-    setTimeout(()=> get_data(symbol), 5000)
+    save_fd(appendable_fd, csv_data);
+    if(time_ordered_bars.length == 1) return
+    setTimeout(()=> get_data(symbol), 2500)
   }
 
 }
 async function get_minutely(symbol, start, end){
-  let bars = await alpaca.getBars('minute', symbol, {start:start, end: end})
+  let bars = await alpaca.getBars('1Min', symbol, {start:start, end: end})
   return bars
 
 }

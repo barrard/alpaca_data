@@ -10,8 +10,27 @@ module.exports = {
   read_file,
   get_file_stats,
   open_file,
-  save_fd, read_csv
+  save_fd, read_csv, w_trucate_fd, close_fd
 };
+
+
+async function close_fd(fd) {
+  try {
+    return await fs.close(fd);
+  } catch (err) {
+    logger.log("err".bgRed);
+    logger.log(err);
+  }
+}
+async function w_trucate_fd(file_path) {
+  try {
+    let fd = await fs.open(file_path, "w");
+    return fd;
+  } catch (err) {
+    logger.log("err".bgRed);
+    logger.log(err);
+  }
+}
 async function read_csv(fd){
   let file_stats = await get_file_stats(fd);
   var file_buffer = new Buffer(file_stats.size);
@@ -37,13 +56,13 @@ async function get_file_stats(file) {
 async function open_file(file_path) {
   try {
     /* Open file for read and append*/
-    let fd = await fs.open(file_path, "a+");
+    let appendable_fd = await fs.open(file_path, "a+");
     let file_stats = await get_file_stats(file_path);
     /* Read the file */
     var file_buffer = new Buffer(file_stats.size);
   
     let { bytesRead, buffer } = await fs.read(
-      fd,
+      appendable_fd,
       file_buffer,
       0,
       file_buffer.length,
@@ -51,7 +70,7 @@ async function open_file(file_path) {
     );
       let csv_file_data = buffer.toString("utf8", 0, buffer.length);
       
-    return {csv_file_data, fd} 
+    return {csv_file_data, appendable_fd} 
 
   } catch (err) {
     logger.log("err".bgRed);
@@ -96,7 +115,7 @@ async function write_access_token(token) {
 
 async function save_fd(fd, data) {
   try {
-    await fs.write(fd, data);
+    await fs.write(fd, data+'\r\n');
     await fs.close(fd);
   } catch (err) {
     logger.log("err".bgRed);

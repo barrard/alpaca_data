@@ -29,11 +29,13 @@ function high_to_low(a, b, prop) {
   return 0;
 }
 
-async function bars_to_csv(data, header) {
+async function bars_to_csv(data, header=false) {
   let data_length = data.length;
   let counter = 0;
-  const fields = ["o", "h", "l", "c", "t"];
+  const fields = ["o", "h", "l", "c", "t", "v"];
   const opts = { fields, header };
+  logger.log(`header = ${opts.header}`)
+
   let csv = await parseAsync(data, opts)
     .then(csv => csv)
     .catch(err => console.error(err));
