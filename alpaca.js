@@ -14,6 +14,7 @@ const {
   save_fd,
   open_file, 
 } = require("./utils/files.js");
+let {get_xbrl_docs_for_ticker} = require('./utils/gather_xbrl_files.js')
 
 //https://github.com/alpacahq/alpaca-trade-api-js
 // https://github.com/alpacahq/marketstore
@@ -30,7 +31,17 @@ async function get_sccount() {
   console.log("Current Account:", account);
 }
 
-// gather_all_symbols()//Get all symbols in the symbols.js file
+gather_all_xbrl()//Get all symbols in the symbols.js file and get 10-q, 10-k
+function gather_all_xbrl(){
+  high_vol_symbols.map((symbol, index)=>{
+    setTimeout(()=>{
+      get_xbrl_docs_for_ticker(symbol, '10-q')
+      setTimeout(()=> get_xbrl_docs_for_ticker(symbol, '10-k'), 10000)
+    }, index*1000*90)
+  })
+}
+
+//Get all symbols in the symbols.js file
 function gather_all_symbols(){
   high_vol_symbols.map((symbol, index)=>{
     setTimeout(()=>{
