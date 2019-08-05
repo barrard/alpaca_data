@@ -31,7 +31,7 @@ async function get_sccount() {
   console.log("Current Account:", account);
 }
 
-gather_all_xbrl()//Get all symbols in the symbols.js file and get 10-q, 10-k
+// gather_all_xbrl()//Get all symbols in the symbols.js   ile and get 10-q, 10-k
 function gather_all_xbrl(){
   high_vol_symbols.map((symbol, index)=>{
     setTimeout(()=>{
@@ -42,6 +42,7 @@ function gather_all_xbrl(){
 }
 
 //Get all symbols in the symbols.js file
+// gather_all_symbols()
 function gather_all_symbols(){
   high_vol_symbols.map((symbol, index)=>{
     setTimeout(()=>{
@@ -66,7 +67,7 @@ async function get_data(symbol) {
 
     logger.log("File is empty!");
     let start = 0
-    let end = new Date("2019", "5", "27", "0", "0");
+    let end = new Date("2019", "6", "27", "0", "0");
     let bars = await get_minutely(symbol,start, end)
     let csv_data = await bars_to_csv(bars[symbol], true);
 

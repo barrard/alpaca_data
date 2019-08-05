@@ -118,6 +118,36 @@ const Sec_Listing = mongoose.model("Sec_Listing", Sec_Listing_Schema);
 module.exports = Sec_Listing;
 Sec_Listing.add_listing = add_listing;
 Sec_Listing.last_saved_filing = last_saved_filing;
+Sec_Listing.read_all_listings = read_all_listings
+Sec_Listing.get_company_list = get_company_list;
+Sec_Listing.get_all_company_fillings = get_all_company_fillings
+
+async function get_all_company_fillings(co_name){
+  logger.log('looking for '+co_name)
+  let listings = await Sec_Listing.find({
+    EntityRegistrantName:co_name
+  })
+  logger.log(listings)
+  return listings
+}
+
+async function get_company_list(){
+  let all_filings = await read_all_listings()
+  //get all unique names
+  let comapny_names = []
+  all_filings.forEach(filling =>{
+    let name = filling.EntityRegistrantName
+    if(comapny_names.indexOf(name) == -1) {
+      comapny_names.push(name)
+    } 
+  })
+  return comapny_names
+}
+
+async function read_all_listings(){
+  let all_filings = await Sec_Listing.find({})
+  return all_filings
+}
 
 async function last_saved_filing() {
   let last_filing = await Sec_Listing.find({})
@@ -139,7 +169,7 @@ async function add_listing(listing) {
     // let new_listing = new Sec_Listing(listing);
     // let saved = await new_listing.save({ new: true });
     // logger.log({ saved });
-    // return saved;
+    return new_listing;
   } catch (err) {
     logger.log("err".bgRed);
     logger.log(err)

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="plotly.js"></script>
+
+  <title>hi</title>
+  <style>
+    .co_name_button {
+      margin: 2px;
+    }
+
+    .inline {
+      display: inline;
+    }
+
+    .chart_canvas {
+      /* min-height: 30vh; */
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="compant_list">
+
+  </div>
+  <div id="tester" style="width:600px;height:250px;"></div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", init);
+    var dalist
+    function init() {
+      x = [1, 2, 3, 4, 5]
+      y = [1, 2, 4, 8, 16]
+      draw_plotly(x, y, 'tester')
+
+
+
+      //get company list
+      get_company_list()
+
+
+    }
+
+    function draw_plotly(x, y, el) {
+      EL = document.getElementById(el);
+      Plotly.plot(EL, [{
+        x, y
+      }], {
+          margin: { t: 0 }
+        });
+    }
+
+    async function get_company_list() {
+      let json_resp = await fetch('/company_list')
+      let { company_list } = await json_resp.json()
+      dalist = company_list
+      make_company_list(company_list.sort())
+    }
+
+    function make_company_list(compant_list) {
+      console.log(compant_list)
+      let company_list_element = document.getElementById('compant_list')
+      company_name_item = (name) => (`
+      <button class="inline co_name_button" onClick="set_company('${name}')">${name}</button>`)
+      let co_name_list = ''
+      compant_list.forEach(name => {
+        co_name_list += company_name_item(name)
+      });
+
+      company_list_element.innerHTML = (co_name_list)
+
+
+    }
+
+    async function set_company(name) {
+      console.log('set comapny ' + name)
+      //fetch all listing sof named company
+      let listings_json = await fetch(`/get_all_company_fillings/${name}`)
+      let { all_company_fillings } = await listings_json.json()
+      console.log(all_company_fillings)
+      //make another list
+      make_listings_data_list(all_company_fillings)
+    }
+
+    function make_listings_data_list(fillings) {
+      //get the keys?
+      let listing_keys = Object.keys(fillings[0])
+      console.log(listing_keys)
+      console.log(fillings.length)
+    }
+  </script>
+</body>
+
+</html>

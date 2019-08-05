@@ -15,13 +15,13 @@ let JSON_CIK = null;
 // get_xbrl_docs_for_ticker("INTC", '10-k');
 async function get_xbrl_docs_for_ticker(ticker, type) {
   /* find cik number */
-  let ticker_cik = await get_cik_nmber_for_ticker(ticker, type);
+  let ticker_cik = await get_cik_number_for_ticker(ticker, type);
   logger.log({ticker_cik})
   let  = await query_cik(ticker_cik, type)
 
 }
 
-async function get_cik_nmber_for_ticker(ticker) {
+async function get_cik_number_for_ticker(ticker) {
   if (!JSON_CIK) {
 /***** **** **** **** 
     CIK: '1043533',
