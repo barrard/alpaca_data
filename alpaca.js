@@ -15,7 +15,7 @@ const {
   open_file, 
 } = require("./utils/files.js");
 let {get_xbrl_docs_for_ticker} = require('./utils/gather_xbrl_files.js')
-
+get_xbrl_docs_for_ticker("INTC", '10-k');
 //https://github.com/alpacahq/alpaca-trade-api-js
 // https://github.com/alpacahq/marketstore
 const alpaca = new Alpaca({
@@ -25,8 +25,8 @@ const alpaca = new Alpaca({
 });
 const DATA_DIR = "./data";
 
-// get_sccount()
-async function get_sccount() {
+// get_account()
+async function get_account() {
   let account = await alpaca.getAccount();
   console.log("Current Account:", account);
 }

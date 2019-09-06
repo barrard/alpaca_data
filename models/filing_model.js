@@ -111,7 +111,10 @@ const Sec_Listing_Schema = mongoose.Schema({
   year_month: {type: [String], default: []},
   xml_filename:{type: String, default:'', require:true, unique:true},
   files_downloaded: { type: Boolean, default: false },
-  error_msg:{type:String, default:''}
+  error_msg:{type:String, default:''},
+  ticker:{type:String, default:''},
+  filed_date:{type:String, default:''},
+  unique_id:{type:String,unique : true, required : true}
 });
 
 const Sec_Listing = mongoose.model("Sec_Listing", Sec_Listing_Schema);

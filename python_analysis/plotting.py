@@ -11,6 +11,8 @@ def plot_open_close_symbol(symbol):
     df[['h','l']][:100].plot()
     plt.show()
     
+    
+    
 
 
 

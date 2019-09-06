@@ -10,6 +10,7 @@ let app = express()
 app.use(express.static('../public'));
 
 app.listen('3400')
+logger.log('Listening on 3400')
 
 app.get('/', (req, res)=>{
   logger.log(`/get ${__dirname}`)
